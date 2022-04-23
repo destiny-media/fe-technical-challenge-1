@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useTrail, animated } from 'react-spring'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { useHistory } from "react-router-dom";
 
 import Card from '../../components/Card'
 import Loader from '../../components/Loader'
@@ -12,7 +13,11 @@ import Button from '../../components/Button'
 
 const Toppings = () => {
   const dispatch = useDispatch()
+  const history = useHistory();
   const { selection, options, isFetching } = useSelector(({ Toppings }) => Toppings)
+  const dough = useSelector(({ Dough }) => Dough)
+  const sauce = useSelector(({ Sauces }) => Sauces)
+
   const selectionMap = new Map(selection)
   const animation = useTrail(options.length, { 
     opacity: 1, 
@@ -22,6 +27,8 @@ const Toppings = () => {
     
   useEffect(() => {
     if(options.length === 0) dispatch(getToppings())
+    if (!dough?.selection?.label) history.push("/Dough");
+    if (!sauce?.selection?.label) history.push("/Sauce");
   }, [dispatch, options.length])
 
   return (

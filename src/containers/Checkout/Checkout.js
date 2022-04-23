@@ -5,14 +5,16 @@ import styled from 'styled-components'
 import { setFormProperty, calculateTotals } from './Checkout.slice'
 import Button from '../../components/Button'
 import Input from '../../components/Input/Input'
+import { useHistory } from "react-router-dom";
 import { Link } from 'react-router-dom'
  
 
 const Checkout = () => {
     const dispatch = useDispatch()
+    const history = useHistory();
     const {form, details} = useSelector(({ Checkout }) => Checkout)
     const dough = useSelector(({ Dough }) => Dough).selection
-    const souce = useSelector(({ Sauces }) => Sauces).selection
+    const sauce = useSelector(({ Sauces }) => Sauces).selection
     const toppings = useSelector(({ Toppings }) => Toppings).selection.map(t => t[1])
 
     const handleInputText = (e) => {
@@ -25,8 +27,12 @@ const Checkout = () => {
     }
 
     useEffect(() => {
-       if (!details) dispatch(calculateTotals({dough, souce, toppings}))
-    }, [dispatch, dough, souce, toppings])    
+       if (!details?.total) dispatch(calculateTotals({dough, sauce, toppings}))
+       if (!dough?.label) history.push("/Dough");
+       if (!sauce?.label) history.push("/Sauce")
+       if (!toppings?.length) history.push("/Toppings");
+
+    }, [dispatch, dough, sauce, toppings])    
 
     return (
         <FlexContainer>
@@ -99,9 +105,9 @@ const Checkout = () => {
                 <span> {dough.label} </span> <span>${dough.price?.toFixed(2)}</span>
                 </PizzaSection>
 
-                <p><strong>Souce</strong></p>
+                <p><strong>Sauce</strong></p>
                 <PizzaSection>
-                <span> {souce.label} </span> <span>${souce.price?.toFixed(2)}</span>
+                <span> {sauce.label} </span> <span>${sauce.price?.toFixed(2)}</span>
                 </PizzaSection>
 
                 <p><strong>Toppings</strong></p>

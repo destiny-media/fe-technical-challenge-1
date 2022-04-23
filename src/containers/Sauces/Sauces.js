@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTrail, animated } from 'react-spring'
 import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from "react-router-dom";
 
 import Card from '../../components/Card'
 import { getSauces } from './Sauces.thunks'
@@ -12,7 +13,9 @@ import Container from '../../components/Container'
 
 const Sauces = () => {
   const dispatch = useDispatch()
+  const history = useHistory();
   const { selection, options, isFetching } = useSelector(({ Sauces }) => Sauces)
+  const dough = useSelector(({ Dough }) => Dough)
   const animation = useTrail(options.length, { 
     opacity: 1, 
     transform: 'translateY(0rem)', 
@@ -20,8 +23,9 @@ const Sauces = () => {
   })
 
   useEffect(() => {
-    if(options.length === 0) dispatch(getSauces())
-  }, [dispatch, options.length])
+    if (options.length === 0) dispatch(getSauces())
+    if (!dough?.selection?.label) history.push("/Dough");
+  }, [dispatch, dough, options.length])
 
   return (
     <Container style={{ flexWrap: 'wrap', margin: '4rem', flexDirection: 'row' }}>

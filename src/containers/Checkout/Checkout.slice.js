@@ -4,11 +4,11 @@ import { postOrder } from './Checkout.thunks'
 const CheckoutSlice = createSlice({
   name: 'Checkout',
   initialState: {
-    form: {}
+    form: {},
   },
   reducers: {   
     calculateTotals: (state, {payload}) => {
-      const subtotal = payload.dough.price + payload.souce.price + payload.toppings.reduce((totalTopping, topping) => totalTopping + topping.price, 0);
+      const subtotal = payload.dough.price + payload.sauce.price + payload.toppings.reduce((totalTopping, topping) => totalTopping + topping.price, 0);
       const tax = (5 / 100) * subtotal;
       const total = subtotal + tax ;
       state.details = {total, subtotal, tax}
