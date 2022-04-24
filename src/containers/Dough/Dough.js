@@ -32,7 +32,7 @@ const Dough = () => {
 
           return (
             <animated.div key={item.id} style={style}>
-              <Card 
+              <Card
                 title={item.label} 
                 image={item.image} 
                 description={item.description} 
