@@ -2,17 +2,19 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Container from '../../components/Container'
 import styled from 'styled-components'
-import { setFormProperty, calculateTotals } from './Checkout.slice'
+import { setFormProperty, calculateTotals, reset } from './Checkout.slice'
 import Button from '../../components/Button'
 import Input from '../../components/Input/Input'
 import { useHistory } from "react-router-dom";
+import { postOrder } from './Checkout.thunks'
 import { Link } from 'react-router-dom'
+import Loader from '../../components/Loader'
  
 
 const Checkout = () => {
     const dispatch = useDispatch()
     const history = useHistory();
-    const {form, details} = useSelector(({ Checkout }) => Checkout)
+    const {form, details, order, isFetching} = useSelector(({ Checkout }) => Checkout)
     const dough = useSelector(({ Dough }) => Dough).selection
     const sauce = useSelector(({ Sauces }) => Sauces).selection
     const toppings = useSelector(({ Toppings }) => Toppings).selection.map(t => t[1])
@@ -26,107 +28,124 @@ const Checkout = () => {
                 'pattern': e.target.pattern}))
     }
 
-    useEffect(() => {
-       if (!details?.total) dispatch(calculateTotals({dough, sauce, toppings}))
-       if (!dough?.label) history.push("/Dough");
-       if (!sauce?.label) history.push("/Sauce")
-       if (!toppings?.length) history.push("/Toppings");
+    const submitForm = async (e) => {
+        e.preventDefault();
+        dispatch(postOrder(form));
+    }
 
-    }, [dispatch, dough, sauce, toppings])    
+    useEffect(() => {
+   
+        if (!details?.total) dispatch(calculateTotals({dough, sauce, toppings}))
+        if (!dough?.label) history.push("/Dough")
+        if (!sauce?.label) history.push("/Sauce")
+        if (!toppings?.length) history.push("/Toppings")
+
+        if (order?.status === 200) {
+            dispatch(reset());
+            history.push("/ThankYou")
+        }
+        
+    }, [dispatch, dough, sauce, toppings, order])    
 
     return (
-        <FlexContainer>
-            <FormWrapper>
-                <h1>Checkout</h1>
-                <form onSubmit={e => e.preventDefault()}>
+        isFetching ?
+            <Container style={{ flexWrap: 'wrap', margin: '4rem', flexDirection: 'row' }}>
+                <Loader />
+            </Container> 
+             : 
+            <FlexContainer>
+                <FormWrapper>
+                    <h1>Checkout</h1>
+                    <form onSubmit={e => submitForm(e)}>
 
-                    <Input 
-                        $isValid={form?.name?.isValid}
-                        placeholder="Name" 
-                        type="text" 
-                        name="name" 
-                        max="50"
-                        pattern="^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$" 
-                        value={form?.name?.value || ''}
-                        onChange={e => handleInputText(e)}
-                        required
-                        />
-                    <Input 
-                        $isValid={form?.ccnumber?.isValid}
-                        placeholder="Credit Card Number" 
-                        type="text" 
-                        name="ccnumber" 
-                        max="16"
-                        pattern="(^4[0-9]{12}(?:[0-9]{3})?$)|(^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$)|(3[47][0-9]{13})|(^3(?:0[0-5]|[68][0-9])[0-9]{11}$)|(^6(?:011|5[0-9]{2})[0-9]{12}$)|(^(?:2131|1800|35\d{3})\d{11}$)" 
-                        value={form?.ccnumber?.value || ''}
-                        onChange={e => handleInputText(e)}
-                        required
-                        />
-
-                    <InputWrapper>
-                        <Input
-                            $small={true}
-                            $isValid={form?.ccmonth?.isValid}
-                            placeholder="MM" 
+                        <Input 
+                            $isValid={form?.name?.isValid}
+                            placeholder="Name" 
                             type="text" 
-                            name="ccmonth"
-                            max="2"
-                            pattern="^\d{2,}$"
-                            value={form?.ccmonth?.value || ''}
-                            onChange={e => handleInputText(e)} 
-                            required/>
-                            
-                        <Input
-                            $small={true}
-                            $isValid={form?.ccyear?.isValid}
-                            placeholder="YYYY" 
-                            type="text" 
-                            name="ccyear" 
-                            max="4"
-                            pattern="^\d{4,}$"
-                            value={form?.ccyear?.value || ''}
+                            name="name" 
+                            max="50"
+                            pattern="^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$" 
+                            value={form?.name?.value || ''}
                             onChange={e => handleInputText(e)}
                             required
                             />
-                    </InputWrapper>
+                        <Input 
+                            $isValid={form?.ccnumber?.isValid}
+                            placeholder="Credit Card Number" 
+                            type="text" 
+                            name="ccnumber" 
+                            max="16"
+                            pattern="(^4[0-9]{12}(?:[0-9]{3})?$)|(^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$)|(3[47][0-9]{13})|(^3(?:0[0-5]|[68][0-9])[0-9]{11}$)|(^6(?:011|5[0-9]{2})[0-9]{12}$)|(^(?:2131|1800|35\d{3})\d{11}$)" 
+                            value={form?.ccnumber?.value || ''}
+                            onChange={e => handleInputText(e)}
+                            required
+                            />
+
+                        <InputWrapper>
+                            <Input
+                                $small={true}
+                                $isValid={form?.ccmonth?.isValid}
+                                placeholder="MM" 
+                                type="text" 
+                                name="ccmonth"
+                                max="2"
+                                pattern="^\d{2,}$"
+                                value={form?.ccmonth?.value || ''}
+                                onChange={e => handleInputText(e)} 
+                                required/>
+                                
+                            <Input
+                                $small={true}
+                                $isValid={form?.ccyear?.isValid}
+                                placeholder="YYYY" 
+                                type="text" 
+                                name="ccyear" 
+                                max="4"
+                                pattern="^\d{4,}$"
+                                value={form?.ccyear?.value || ''}
+                                onChange={e => handleInputText(e)}
+                                required
+                                />
+                        </InputWrapper>
+                        
+                        <Button $full={true}>
+                            Place Your Order
+                        </Button>
+                    </form>
+                </FormWrapper>
+
+                <DetailsWrapper>
+                    <h1>Details</h1>
+                    <PizzaImage src={dough.image} alt={dough.title} />
+
+                    <p><strong>Dough</strong></p>
+                    <PizzaSection>
+                    <span> {dough.label} </span> <span>${dough.price?.toFixed(2)}</span>
+                    </PizzaSection>
+
+                    <p><strong>Sauce</strong></p>
+                    <PizzaSection>
+                    <span> {sauce.label} </span> <span>${sauce.price?.toFixed(2)}</span>
+                    </PizzaSection>
+
+                    <p><strong>Toppings</strong></p>
+                    {toppings.map((topping,i) => {
+                        return (<PizzaSection key={i}><span key={i}>{topping.label} </span> <span> ${topping?.price.toFixed(2)}</span></PizzaSection>)
+                    })}
                     
-                    <Button $full={true}>
-                        Place Your Order
-                    </Button>
-                </form>
-            </FormWrapper>
-
-            <DetailsWrapper>
-                <h1>Details</h1>
-                <PizzaImage src={dough.image} alt={dough.title} />
-
-                <p><strong>Dough</strong></p>
-                <PizzaSection>
-                <span> {dough.label} </span> <span>${dough.price?.toFixed(2)}</span>
-                </PizzaSection>
-
-                <p><strong>Sauce</strong></p>
-                <PizzaSection>
-                <span> {sauce.label} </span> <span>${sauce.price?.toFixed(2)}</span>
-                </PizzaSection>
-
-                <p><strong>Toppings</strong></p>
-                {toppings.map((topping,i) => {
-                    return (<PizzaSection key={i}><span key={i}>{topping.label} </span> <span> ${topping?.price.toFixed(2)}</span></PizzaSection>)
-                })}
+                    <TotalSection>
+                        <p> <strong>Subtotal</strong></p> <p>${details?.subtotal?.toFixed(2)}</p>
+                    </TotalSection>
+                    <TotalSection>
+                        <p> <strong>Taxes</strong></p> <p> ${details?.tax?.toFixed(2)}</p>
+                    </TotalSection>
+                    <TotalSection>
+                        <p> <strong>TOTAL</strong></p> <p>${details?.total?.toFixed(2)}</p>
+                    </TotalSection>
                 
-                <TotalSection>
-                    <p> <strong>Subtotal</strong></p> <p>${details?.subtotal?.toFixed(2)}</p>
-                </TotalSection>
-                <TotalSection>
-                    <p> <strong>Taxes</strong></p> <p> ${details?.tax?.toFixed(2)}</p>
-                </TotalSection>
-                <TotalSection>
-                    <p> <strong>TOTAL</strong></p> <p>${details?.total?.toFixed(2)}</p>
-                </TotalSection>
-              
-            </DetailsWrapper>
-        </FlexContainer>
+                </DetailsWrapper>
+                
+            </FlexContainer>
     )
 }
 

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import store from '../../store';
 import { postOrder } from './Checkout.thunks'
 
 const CheckoutSlice = createSlice({
@@ -16,21 +17,24 @@ const CheckoutSlice = createSlice({
     setFormProperty: (state, { payload }) => {
       if (payload.value.length > payload.max) return
       state.form = {...state.form, [payload.name]: {value: payload.value, isValid: new RegExp(payload.pattern).test(payload.value)}}
-    }
+    },
+    reset: (state, { payload} ) => {
+      state.form = {payload}
+    },
   },
   extraReducers: builder => builder
     .addCase(postOrder.pending, state => {
       state.isFetching = true
     })
     .addCase(postOrder.fulfilled, (state, { payload }) => {
-      state.options = payload
+      state.order = payload
       state.isFetching = false
     })
-
 })
 
 export default CheckoutSlice.reducer
 export const {
   calculateTotals,
   setFormProperty,
+  reset,
 } = CheckoutSlice.actions
