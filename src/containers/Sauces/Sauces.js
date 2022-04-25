@@ -2,17 +2,19 @@ import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTrail, animated } from 'react-spring'
 import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from "react-router-dom";
 
 import Card from '../../components/Card'
 import { getSauces } from './Sauces.thunks'
 import { selectSauce } from './Sauces.slice'
-import Button from '../../components/Button'
 import Loader from '../../components/Loader'
-import Container from '../../components/Container'
+import { ButtonWrapper, ContainerWrapper } from './Sauces.styles';
 
 const Sauces = () => {
   const dispatch = useDispatch()
+  const history = useHistory();
   const { selection, options, isFetching } = useSelector(({ Sauces }) => Sauces)
+  const dough = useSelector(({ Dough }) => Dough)
   const animation = useTrail(options.length, { 
     opacity: 1, 
     transform: 'translateY(0rem)', 
@@ -20,11 +22,12 @@ const Sauces = () => {
   })
 
   useEffect(() => {
-    if(options.length === 0) dispatch(getSauces())
-  }, [dispatch, options.length])
+    if (options.length === 0) dispatch(getSauces())
+    if (!dough?.selection?.label) history.push("/Dough");
+  }, [dispatch, dough, history, options.length])
 
   return (
-    <Container style={{ flexWrap: 'wrap', margin: '4rem', flexDirection: 'row' }}>
+    <ContainerWrapper>
       {isFetching ? 
         <Loader /> : 
         animation.map((style, index) => {
@@ -44,15 +47,14 @@ const Sauces = () => {
         })
       }
       {!!selection.id && (
-        <Button 
+        <ButtonWrapper
           as={Link}
           to="/Toppings"
-          style={{ position: 'absolute', bottom: '2rem', right: '2rem' }}
         >
           Go To Toppings!
-        </Button>
+        </ButtonWrapper>
       )}
-    </Container>
+    </ContainerWrapper>
   )
 }
 

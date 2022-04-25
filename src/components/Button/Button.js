@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 
 const Button = styled.button`
+  width: ${({ $full }) => $full ? '100%' : ''};
   border: none;
   color: white;
   padding: 0.5rem 0.75rem;

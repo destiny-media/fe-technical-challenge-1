@@ -2,13 +2,11 @@ import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTrail, animated } from 'react-spring'
 import { useSelector, useDispatch } from 'react-redux'
-
 import Card from '../../components/Card'
 import { getDough } from './Dough.thunks'
 import { selectDough } from './Dough.slice'
 import Loader from '../../components/Loader'
-import Button from '../../components/Button'
-import Container from '../../components/Container'
+import { ButtonWrapper, ContainerWrapper } from './Dough.styles'
 
 const Dough = () => {
   const dispatch = useDispatch()
@@ -24,7 +22,7 @@ const Dough = () => {
   }, [dispatch, options.length])
 
   return (
-    <Container style={{ flexWrap: 'wrap', margin: '4rem', flexDirection: 'row' }}>
+    <ContainerWrapper>
       {isFetching ? 
         <Loader /> : 
         animation.map((style, index) => {
@@ -32,7 +30,7 @@ const Dough = () => {
 
           return (
             <animated.div key={item.id} style={style}>
-              <Card 
+              <Card
                 title={item.label} 
                 image={item.image} 
                 description={item.description} 
@@ -44,15 +42,14 @@ const Dough = () => {
         })
       }
       {!!selection.id && (
-        <Button 
+        <ButtonWrapper 
           as={Link}
           to="/Sauce"
-          style={{ position: 'absolute', bottom: '2rem', right: '2rem' }}
-        >
+          >
           Go To Sauces!
-        </Button>
+        </ButtonWrapper>
       )}
-    </Container>
+    </ContainerWrapper>
   )
 }
 
