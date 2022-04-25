@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit'
-import store from '../../store';
 import { postOrder } from './Checkout.thunks'
 
 const CheckoutSlice = createSlice({

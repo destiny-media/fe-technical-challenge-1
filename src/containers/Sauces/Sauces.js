@@ -7,9 +7,8 @@ import { useHistory } from "react-router-dom";
 import Card from '../../components/Card'
 import { getSauces } from './Sauces.thunks'
 import { selectSauce } from './Sauces.slice'
-import Button from '../../components/Button'
 import Loader from '../../components/Loader'
-import Container from '../../components/Container'
+import { ButtonWrapper, ContainerWrapper } from './Sauces.styles';
 
 const Sauces = () => {
   const dispatch = useDispatch()
@@ -25,10 +24,10 @@ const Sauces = () => {
   useEffect(() => {
     if (options.length === 0) dispatch(getSauces())
     if (!dough?.selection?.label) history.push("/Dough");
-  }, [dispatch, dough, options.length])
+  }, [dispatch, dough, history, options.length])
 
   return (
-    <Container style={{ flexWrap: 'wrap', margin: '4rem', flexDirection: 'row' }}>
+    <ContainerWrapper>
       {isFetching ? 
         <Loader /> : 
         animation.map((style, index) => {
@@ -48,15 +47,14 @@ const Sauces = () => {
         })
       }
       {!!selection.id && (
-        <Button 
+        <ButtonWrapper
           as={Link}
           to="/Toppings"
-          style={{ position: 'absolute', bottom: '2rem', right: '2rem' }}
         >
           Go To Toppings!
-        </Button>
+        </ButtonWrapper>
       )}
-    </Container>
+    </ContainerWrapper>
   )
 }
 

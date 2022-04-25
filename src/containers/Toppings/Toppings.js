@@ -8,8 +8,7 @@ import Card from '../../components/Card'
 import Loader from '../../components/Loader'
 import { getToppings } from './Toppings.thunks'
 import { selectToppings } from './Toppings.slice'
-import Container from '../../components/Container'
-import Button from '../../components/Button'
+import { ButtonWrapper, ContainerWrapper } from './Toppings.styles';
 
 const Toppings = () => {
   const dispatch = useDispatch()
@@ -29,10 +28,10 @@ const Toppings = () => {
     if(options.length === 0) dispatch(getToppings())
     if (!dough?.selection?.label) history.push("/Dough");
     if (!sauce?.selection?.label) history.push("/Sauce");
-  }, [dispatch, options.length])
+  }, [dispatch, dough, sauce, history, options.length])
 
   return (
-    <Container style={{ flexWrap: 'wrap', width: '80%', alignSelf: 'center', flexDirection: 'row' }}>
+    <ContainerWrapper>
       {isFetching ? 
         <Loader /> : 
         animation.map((style, index) => {
@@ -46,17 +45,16 @@ const Toppings = () => {
         })
       }
       {!!selection.length && (
-        <Button 
+        <ButtonWrapper
           as={Link}
           to="/Checkout"
-          style={{ position: 'absolute', bottom: '2rem', right: '2rem' }}
         >
           Go To Checkout!
-        </Button>
+        </ButtonWrapper>
       )}
        
             
-    </Container>
+    </ContainerWrapper>
   )
 }
 

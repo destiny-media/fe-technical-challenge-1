@@ -51,11 +51,11 @@ const Checkout = () => {
             history.push("/ThankYou")
         }
         
-    }, [dispatch, dough, sauce, toppings, order])    
+    }, [dispatch, dough, sauce, toppings, details, order, history])    
 
     return (
         isFetching ?
-            <Container style={{ flexWrap: 'wrap', margin: '4rem', flexDirection: 'row' }}>
+            <Container>
                 <Loader />
             </Container> 
             
@@ -75,3 +75,5 @@ const Checkout = () => {
     }
 
 export default Checkout
+
+
