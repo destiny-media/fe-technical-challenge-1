@@ -6,11 +6,13 @@ export const DetailsSection = styled.div`
     padding: 20px 60px 20px 60px;
 `
 
-export const PizzaImage = styled.img`
-    flex: 2;
-    max-height: 10rem;
-    min-width: 17rem;
-    display: flex;
+export const PizzaImage = styled.div`
+    position: relative;
+    height: 10rem;
+    width: 17rem;
+    background-size: cover;
+    background-image: url(${({ $image }) => $image});
+    background-position: center;
 `
 
 export const PizzaWrapper = styled.div`  

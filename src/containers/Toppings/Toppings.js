@@ -39,7 +39,7 @@ const Toppings = () => {
 
           return (
             <animated.div key={item.id} style={style}>
-              <Card title={item.label} footnote={<span>${item.price}</span>} isActive={selectionMap.has(item.id)} onClick={() => dispatch(selectToppings(item))} />
+              <Card title={item.label} footnote={<span>${item.price?.toFixed(2)}</span>} isActive={selectionMap.has(item.id)} onClick={() => dispatch(selectToppings(item))} />
             </animated.div>
           )
         })
